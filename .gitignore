@@ -1,0 +1,15 @@
+# Config
+*.ini
+*.json
+src/config.py
+
+# Log files: 
+*.log
+*.log*
+*.txt
+
+# Environments
+.venv
+venv/
+venv.bak/
+
