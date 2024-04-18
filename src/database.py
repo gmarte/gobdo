@@ -1,52 +1,49 @@
-import psycopg2
-from psycopg2 import sql
+import pymongo
+from config import MONGODB
 import logging
-from config import DATABASE
-
 
 class Database:
     def __init__(self):
-        self.conn = None
-        self.cur = None
+        self.client = None
+        self.db = None
         self.logger = logging.getLogger(__name__)
         logging.basicConfig(level=logging.INFO)
 
     def connect(self):
         try:
-            self.conn = psycopg2.connect(
-                dbname=DATABASE['database'],
-                user=DATABASE['user'],
-                password=DATABASE['password'],
-                host=DATABASE['host'],
-                port=DATABASE['port'],
-            )
-            self.cur = self.conn.cursor()
+            self.client = pymongo.MongoClient(MONGODB['url'])
+            self.db = self.client[MONGODB['db']]  # specify your database name here
             self.logger.info('Successfully connected to the database')
         except Exception as e:
             self.logger.error(f"Failed to connect to the database: {e}")
             raise
-
-    def insert_institution(self, name, domain):
+    def get_all_institutions(self):
         try:
-            insert_sql = sql.SQL(
-                """
-                INSERT INTO institutions (name, domain) 
-                VALUES (%s, %s)
-                ON CONFLICT (domain) DO NOTHING;
-                """
-            )
-            self.cur.execute(insert_sql, (name, domain))
-            self.conn.commit()
-            self.logger.info(
-                f'Successfully inserted {domain} into the database')
+            institutions_collection = self.db['institutions']
+            institutions = list(institutions_collection.find({}))  # Retrieve all documents in the 'institutions' collection
+            self.logger.info(f"Retrieved {len(institutions)} institutions.")
+            return institutions
         except Exception as e:
-            self.logger.error(
-                f"Failed to insert institution into the database: {e}")
-            # Optionally, you could rollback the transaction if there's an error
-            # self.conn.rollback()
+            self.logger.error(f"Failed to retrieve institutions: {e}")
+            return []  # Return an empty list in case of an error
+    def insert_institution(self, institution):
+        try:
+            institutions_collection = self.db['institutions']
+            result = institutions_collection.insert_one(institution)
+            self.logger.info(f"Successfully inserted institution with ID: {result.inserted_id}")
+        except Exception as e:
+            self.logger.error(f"Failed to insert institution: {e}")
+
+    def insert_many_institutions(self, institutions):
+        try:
+            institutions_collection = self.db['institutions']
+            result = institutions_collection.insert_many(institutions)
+            self.logger.info(f"Successfully inserted {len(result.inserted_ids)} institutions")
+        except Exception as e:
+            self.logger.error(f"Failed to insert institutions: {e}")
+            raise
 
     def close(self):
-        if self.conn is not None and self.cur is not None:
-            self.cur.close()
-            self.conn.close()
+        if self.client is not None:
+            self.client.close()
             self.logger.info('Database connection closed')
