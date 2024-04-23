@@ -15,15 +15,14 @@ This application is designed to:
 1. Clone this repository: `git clone https://github.com/gmarte/gobdo.git`
 2. Change into the directory: `cd gobdo`
 3. Install the required Python packages: `pip install -r requirements.txt`
-4. Set up the PostgreSQL database by following the instructions in `config.py`.
+4. Set up the MongoDB database by following the instructions in `config.py`.
 5. Run the application: `python src/main.py`
 
 ## Usage
 
 To start the web scraping process, run the `main.py` script located in the `src` directory:
 
-
-This will start the web scraping process and the collected data will be stored in the PostgreSQL database configured in `config.py`.
+This will start the web scraping process and the collected data will be stored in the MongoDB database configured in `config.py`.
 
 ## File Structure
 
@@ -43,5 +42,3 @@ If you want to contribute to this project, please fork the repository, make your
 ## License
 
 This project is licensed under the MIT License. See `LICENSE` for more details.
-
-
