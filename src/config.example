@@ -1,14 +1,9 @@
 # config.py
 
-# Database configuration
-DATABASE = {
-    'database': 'yourdatabase',
-    'user': 'yoursuer',
-    'password': 'yourpassword',
-    'host': 'localhost',
-    'port': 'dbaseport',
+MONGODB = {
+    'url' : '',
+    'db': '',
 }
-
 # List of government websites to scrape
 GOVERNMENT_WEBSITES = [
     # Add websites here
